@@ -1,3 +1,5 @@
+#
+
 #A1 - Inyección
 
 Las fallas de inyección ocurren cuando se envían datos que no son de confianza a un intérprete como parte de un comando o consulta.Los datos hostiles del atacante pueden engañar al intérprete para que ejecute comandos no deseados o acceda a los datos sin la debida autorización.
@@ -40,7 +42,6 @@ El eval procesa todo incluyendo codigo Java script la remediación mas sencilla 
 
  
 #Autenticación y gestión de sesiones A2-Broken
-
 
 En este ataque, un atacante (que puede ser un atacante externo anónimo, un usuario con cuenta propia que puede intentar robar datos de las cuentas o un interno que quiere disfrazar sus acciones) utiliza filtraciones o fallas en las funciones de autenticación o administración de sesiones. hacerse pasar por otros usuarios. Las funciones de la aplicación relacionadas con la autenticación y la gestión de sesiones a menudo no se implementan correctamente, lo que permite a los atacantes comprometer contraseñas, claves o tokens de sesión, o aprovechar otras fallas de implementación para asumir las identidades de otros usuarios.
 Los desarrolladores con frecuencia crean esquemas personalizados de autenticación y administración de sesiones, pero construirlos correctamente es difícil. Como resultado, estos esquemas personalizados frecuentemente tienen fallas en áreas como cierre de sesión, administración de contraseñas, tiempos de espera, recordarme, pregunta secreta, actualización de cuenta, etc. Encontrar tales fallas a veces puede ser difícil, ya que cada implementación es única.
