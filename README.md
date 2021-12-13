@@ -1,4 +1,4 @@
-## A1
+#A1 - Inyección
 
 Las fallas de inyección ocurren cuando se envían datos que no son de confianza a un intérprete como parte de un comando o consulta.Los datos hostiles del atacante pueden engañar al intérprete para que ejecute comandos no deseados o acceda a los datos sin la debida autorización.
 
@@ -39,7 +39,9 @@ El eval procesa todo incluyendo codigo Java script la remediación mas sencilla 
  
 
  
-Autenticación y gestión de sesiones A2-Broken
+#Autenticación y gestión de sesiones A2-Broken
+
+
 En este ataque, un atacante (que puede ser un atacante externo anónimo, un usuario con cuenta propia que puede intentar robar datos de las cuentas o un interno que quiere disfrazar sus acciones) utiliza filtraciones o fallas en las funciones de autenticación o administración de sesiones. hacerse pasar por otros usuarios. Las funciones de la aplicación relacionadas con la autenticación y la gestión de sesiones a menudo no se implementan correctamente, lo que permite a los atacantes comprometer contraseñas, claves o tokens de sesión, o aprovechar otras fallas de implementación para asumir las identidades de otros usuarios.
 Los desarrolladores con frecuencia crean esquemas personalizados de autenticación y administración de sesiones, pero construirlos correctamente es difícil. Como resultado, estos esquemas personalizados frecuentemente tienen fallas en áreas como cierre de sesión, administración de contraseñas, tiempos de espera, recordarme, pregunta secreta, actualización de cuenta, etc. Encontrar tales fallas a veces puede ser difícil, ya que cada implementación es única.
 
@@ -112,7 +114,7 @@ var PASS_RE =/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
  
 
  
-Secuencias de comandos A3 entre sitios (XSS)
+#Secuencias de comandos A3 entre sitios (XSS)
 Los defectos de XSS ocurren cuando una aplicación toma datos que no son de confianza y los envía a un navegador web sin la validación o el escape adecuados. XSS permite a los atacantes ejecutar scripts en el navegador de las víctimas, que pueden acceder a las cookies, tokens de sesión u otra información confidencial retenida por el navegador, o redirigir al usuario a sitios maliciosos.
 
 En nodegoat vemos un xss de tipo almacenad. Lo que hace es enviar un xss al servidor se puede ver una salida como si fuesa reflected (el servidor repite los datos maliciosos en una respuesta inmediata a una solicitud HTTP de la víctima) pero además se guarda en algún lado sin sanitizar (el código aun permanece). Lo prevenimos sanitizando este tipo de entrada que envían JavaScripting como la salida. El XSS es aun mas peligroso si nuestra cookie de sesion no utiliza el http Only (Es difícil prevenir todos los defectos XSS en una aplicación. Para ayudar a mitigar el impacto de una falla XSS en su sitio, configure la marca HTTPOnly en la cookie de sesión y cualquier cookie personalizada a la que no se requiera acceder mediante JavaScript.) esto hace que la cookie de sesión sea únicamente utilizado por HTTP. Otra protección es Implementar la política de seguridad de contenido (CSP) básicamente esto hace que le definamos a quienes acceden a los script (podemos poner que accedan los del mismo dominio que la pagina o los de una lista blanca)
@@ -127,7 +129,7 @@ swig.init ({
  
 autoescape : true
 (server.js,)  
-Referencias de objetos directos inseguras de A4
+#Referencias de objetos directos inseguras de A4
 Una referencia directa a un objeto ocurre cuando un desarrollador expone una referencia a un objeto de implementación interno, como un archivo, directorio o clave de base de datos. Sin una verificación de control de acceso u otra protección, los atacantes pueden manipular estas referencias para acceder a datos no autorizados.
 En el caso de NodeGoat al hacer una consulta sobre alocation en la url podemos ver el parametro de sessionID, simplemnte cambiando el numero de sessionID podemos ver informacion de otro usuario 
 imagen
@@ -144,7 +146,7 @@ var userId = req.session.userId;
 
 
  
-Configuración incorrecta de A5-Security
+#Configuración incorrecta de A5-Security
 Esta vulnerabilidad permite que un atacante acceda a cuentas predeterminadas, páginas no utilizadas, fallas sin parches, archivos y directorios desprotegidos, etc. para obtener acceso no autorizado o conocimiento del sistema.
 La configuración incorrecta de la seguridad puede ocurrir en cualquier nivel de una pila de aplicaciones, incluida la plataforma, el servidor web, el servidor de aplicaciones, la base de datos, el marco y el código personalizado.
 Los desarrolladores y los administradores del sistema deben trabajar juntos para garantizar que toda la pila esté configurada correctamente.
@@ -188,7 +190,7 @@ key: "sessionId",
 
 
 
-Exposición de datos sensibles - A6
+#Exposición de datos sensibles - A6
 Esta vulnerabilidad permite que un atacante acceda a datos confidenciales como tarjetas de crédito, identificaciones fiscales, credenciales de autenticación, etc. para realizar fraudes con tarjetas de crédito, robo de identidad u otros delitos. La pérdida de estos datos puede causar un impacto comercial severo y dañar la reputación. Los datos confidenciales merecen una protección adicional, como el cifrado en reposo o en tránsito, así como precauciones especiales cuando se intercambian con el navegador.
 
 // carga para establecer una conexión HTTPS segura
@@ -221,7 +223,7 @@ Encriptación de datos del usuario
         return decipher.update(toDecrypt, "hex", "utf8") + decipher.final("utf8");
     };
 (profile-dao.js)
-A7-Control de acceso de nivel de función faltante
+#A7-Control de acceso de nivel de función faltante
 
 La mayoría de las aplicaciones web verifican los derechos de acceso a nivel de función antes de hacer visible esa funcionalidad en la interfaz de usuario. Sin embargo, las aplicaciones deben realizar las mismas comprobaciones de control de acceso en el servidor cuando se accede a cada función.
 
@@ -243,7 +245,7 @@ var isAdmin = sessionHandler.isAdminUserMiddleware;
  
 
 En esta imagen vemos que al usuario por más que modifique la url no le trae información.
-A8-Falsificación de solicitud entre sitios (CSRF)
+#A8-Falsificación de solicitud entre sitios (CSRF)
 Un ataque CSRF obliga al navegador de una víctima que ha iniciado sesión a enviar una solicitud HTTP falsificada, incluida la cookie de sesión de la víctima y cualquier otra información de autenticación incluida automáticamente, a una aplicación web vulnerable. Esto permite al atacante obligar al navegador de la víctima a generar solicitudes que la aplicación vulnerable procesa como solicitudes legítimas de la víctima.
 
 Es un ataque donde el navegador de la victima es engañado para que emita un comando a una aplicación web vulnerable • La vulnerabilidad es causada debido a que los navegadores incluyen automáticamente información de autenticación del usuario (ID de sesión, dirección IP, credenciales de dominio Windows, ...) en cada pedido HTTP
@@ -260,7 +262,7 @@ Esta vulnerabilidad esta descontinuada y existe una librería que evita estos at
 (server.js)
 
 
-A9-Uso de componentes con vulnerabilidades conocidas
+#A9-Uso de componentes con vulnerabilidades conocidas
 Básicamente este tipo de herramientas en el caso de node.js es validar las dependencias en un Json y cada dependencia tiene sus propias dependencias. Por el ejemplo swing publifile que tiene una vulnerabilidad publicada. 
 Lo que debemos hacer es mirar las versiones encontradas en el Jason y corregirlas. Luego volver a generar el proyecto. De esta manera se corrigen las dependencias que tenemos actualmente 
 Estas correcciones se pueden resolver con npm Audit 
@@ -272,7 +274,7 @@ Prevenimos esta vulnervilidad
 •	Investiga qué tan popular es el paquete, qué otros paquetes lo usan, si el autor ha escrito otros paquetes, etc.
 •	Bloquear la versión de los paquetes utilizados
 •	Mire los repositorios de Github para ver las notificaciones. Esto nos informará si se descubre alguna vulnerabilidad en el paquete en el futuro.
-A10: redireccionamientos y reenvíos no validados
+#A10: redireccionamientos y reenvíos no validados
 Las aplicaciones web suelen redirigir y reenviar a los usuarios a otras páginas y sitios web, y utilizan datos que no son de confianza para determinar las páginas de destino. Sin la validación adecuada, los atacantes pueden redirigir a las víctimas a sitios de phishing o malware, o utilizar reenvíos para acceder a páginas no autorizadas.
 
 En el caso de NodeGoat cuando nos posicionamos sobre una sección de la página, nos muestra en la parte inferior el link (la muestra a través de un parámetro) donde nos vamos a redirigir.
@@ -293,4 +295,4 @@ Estos links nos pueden llevar a un lugar malicioso (malware, pishing) y la remed
 
 
 	
- 
+
