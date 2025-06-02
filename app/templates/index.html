@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Real-time Detection System</h1>
+    </header>
+
+    <main>
+        <section id="videoSection">
+            <h2>Video Feed</h2>
+            <div style="position: relative; width: fit-content; height: fit-content;">
+                <img id="videoFeed" src="" alt="Video Feed">
+                <canvas id="roiCanvas" style="position: absolute; top: 0; left: 0; cursor: crosshair;"></canvas>
+            </div>
+        </section>
+
+        <section id="controlsAndInfoSection">
+            <div class="config-section">
+                <h2>ROI Configuration</h2>
+                <div class="form-group">
+                    <label for="roiIdInput">ROI ID (optional, leave blank to auto-generate):</label>
+                    <input type="text" id="roiIdInput" name="roiIdInput">
+                </div>
+                <div class="form-group">
+                    <label for="modelSelect">Select Model:</label>
+                    <select id="modelSelect" name="modelSelect">
+                        {% if available_models %}
+                            {% for model_name in available_models %}
+                                <option value="{{ model_name }}">{{ model_name }}</option>
+                            {% else %}
+                                <option value="">No models available</option>
+                            {% endfor %}
+                        {% else %}
+                             <option value="" disabled selected>Loading models...</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="targetClassesInput">Target Classes (comma-separated, e.g., person,car):</label>
+                    <input type="text" id="targetClassesInput" name="targetClassesInput" value="person">
+                </div>
+                <div class="form-group">
+                    <label for="minConfidenceInput">Minimum Confidence (0.0-1.0):</label>
+                    <input type="number" id="minConfidenceInput" name="minConfidenceInput" step="0.05" min="0" max="1" value="0.5">
+                </div>
+                <div class="form-group">
+                    <label for="maxNoDetectionTimeInput">Max No-Detection Time (seconds):</label>
+                    <input type="number" id="maxNoDetectionTimeInput" name="maxNoDetectionTimeInput" min="1" value="60">
+                </div>
+                <p>Click and drag on the video feed to define an ROI. Click "Add/Update ROI" to submit.</p>
+                <button id="addRoiButton">Add/Update ROI</button>
+                <button id="clearRoiButton">Clear Current ROI Drawing</button>
+            </div>
+
+            <div class="status-section">
+                <h2>Detection Status</h2>
+                <div id="detectionInfo">
+                    <p>No detections yet.</p>
+                </div>
+            </div>
+
+             <div class="status-section">
+                <h2>Active ROIs</h2>
+                <div id="activeRoisList">
+                    <!-- ROIs will be listed here by scripts.js -->
+                    <p>No ROIs configured yet.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io();
+            const videoFeed = document.getElementById('videoFeed');
+            const roiCanvas = document.getElementById('roiCanvas'); // For drawing ROIs
+            const detectionInfo = document.getElementById('detectionInfo');
+            const modelSelect = document.getElementById('modelSelect');
+            
+            // Attempt to get models passed from Flask template
+            let availableModelsFlask = [];
+            try {
+                availableModelsFlask = {{ available_models | tojson | safe }};
+            } catch (e) {
+                console.warn("Could not parse available_models from Flask, will rely on SocketIO if implemented.");
+            }
+
+            if (modelSelect.options.length <= 1 && availableModelsFlask && availableModelsFlask.length > 0) {
+                modelSelect.innerHTML = ''; // Clear "Loading..." or "No models"
+                availableModelsFlask.forEach(modelName => {
+                    const option = document.createElement('option');
+                    option.value = modelName;
+                    option.textContent = modelName;
+                    modelSelect.appendChild(option);
+                });
+            } else if (modelSelect.options.length === 0 || (modelSelect.options.length === 1 && modelSelect.options[0].disabled)) {
+                modelSelect.innerHTML = '<option value="" disabled selected>No models loaded</option>';
+            }
+
+            function arrayBufferToBase64(buffer) {
+                let binary = '';
+                const bytes = new Uint8Array(buffer);
+                const len = bytes.byteLength;
+                for (let i = 0; i < len; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return window.btoa(binary);
+            }
+
+            socket.on('video_frame', function(data) {
+                if (data.image_data) {
+                    videoFeed.src = 'data:image/jpeg;base64,' + arrayBufferToBase64(data.image_data);
+                    // Make canvas same size as video feed for drawing
+                    if (roiCanvas.width !== videoFeed.offsetWidth || roiCanvas.height !== videoFeed.offsetHeight) {
+                        roiCanvas.width = videoFeed.offsetWidth;
+                        roiCanvas.height = videoFeed.offsetHeight;
+                    }
+                }
+            });
+
+            socket.on('detection_update', function(data) {
+                let infoHtml = '';
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach(roiResult => {
+                        infoHtml += `<p><strong>ROI ID: ${roiResult.roi_id}</strong> (Alert: <span style="color: ${roiResult.alert_status ? 'red' : 'green'}">${roiResult.alert_status}</span>)<br>`;
+                        if (roiResult.detections && roiResult.detections.length > 0) {
+                            roiResult.detections.forEach(det => {
+                                infoHtml += `- ${det.class_name} (${(det.confidence * 100).toFixed(2)}%)<br>`;
+                            });
+                        } else {
+                            infoHtml += '- No detections in this frame.<br>';
+                        }
+                        infoHtml += '</p>';
+                    });
+                } else {
+                    infoHtml = '<p>No detections in this frame from any ROI.</p>';
+                }
+                detectionInfo.innerHTML = infoHtml;
+            });
+
+            socket.on('connect', () => {
+                console.log('Connected to server with Socket.IO');
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+            });
+
+            socket.on('roi_add_success', (data) => {
+                console.log('ROI Add Success:', data);
+                alert(`ROI ${data.roi_id} added/updated successfully!`);
+            });
+
+            socket.on('roi_update_success', (data) => { // Consolidating, as backend uses add_roi for both
+                console.log('ROI Update Success:', data);
+                alert(`ROI ${data.roi_id} updated successfully!`);
+            });
+
+            socket.on('roi_update_error', (data) => {
+                console.error('ROI Error:', data);
+                alert(`Error with ROI ${data.roi_id || ''}: ${data.message}`);
+            });
+        });
+    </script>
+    <!-- Link to static/scripts.js for ROI drawing and form submission logic -->
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>

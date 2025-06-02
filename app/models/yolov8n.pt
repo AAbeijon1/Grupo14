@@ -1,0 +1,4 @@
+# This is a dummy file for YOLO model loading.
+# It does not contain actual model weights.
+# Create an empty file or add minimal content if required by file handling.
+placeholder_content=True

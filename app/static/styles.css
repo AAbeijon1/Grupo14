@@ -1,0 +1,98 @@
+/* Basic styling for the application */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1em 0;
+    text-align: center;
+    width: 100%;
+}
+
+main {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 20px;
+    width: 100%;
+    max-width: 1600px; /* Adjust as needed */
+}
+
+#videoSection {
+    flex-basis: 60%; /* Video takes more space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#videoFeed {
+    width: 100%;
+    max-width: 960px; /* Max width for the video feed */
+    height: auto;
+    border: 1px solid #ddd;
+    background-color: #000; /* Placeholder background */
+}
+
+#controlsAndInfoSection {
+    flex-basis: 35%; /* Controls and info take less space */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.config-section, .status-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select {
+    width: calc(100% - 22px); /* Adjust for padding/border */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #5cb85c;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+#detectionInfo {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e9e9e9;
+    border-radius: 4px;
+    min-height: 50px;
+    white-space: pre-wrap; /* To respect newlines if any */
+}
