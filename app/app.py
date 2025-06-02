@@ -93,6 +93,7 @@ def video_processing_thread_func():
             time.sleep(0.5) # Wait a bit before retrying or breaking
             continue
 
+        all_detections_for_frame = [] # Initialize for each frame
         all_current_rois = roi_manager.get_all_rois()
         # print(f"Processing frame with {len(all_current_rois)} ROIs") # Can be very verbose
 
